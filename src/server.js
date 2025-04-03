@@ -11,8 +11,5 @@ wss.on("connection", (ws) => {
   ws.on("message", (data) => {
     wss.clients.forEach((client) => client.send(data.toString()));
   });
-
   console.log("Client connected");
 });
-
-console.log("WebSocket server running on port", process.env.PORT || 8080);
