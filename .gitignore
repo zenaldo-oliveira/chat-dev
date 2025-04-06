@@ -1,0 +1,28 @@
+# 👉 Ignorar dependências do Node.js
+backend/node_modules/
+
+# 👉 Ignorar variáveis de ambiente (.env)
+backend/src/.env
+
+# 👉 Ignorar arquivos de lock (se não quiser versionar)
+# backend/package-lock.json
+
+# 👉 Logs
+*.log
+npm-debug.log*
+
+# 👉 Arquivos temporários e de sistema
+.DS_Store
+Thumbs.db
+
+# 👉 Configs do VSCode (opcional)
+.vscode/
+
+# 👉 Cache do sistema
+.env.*
+*.local
+*.cache
+
+# 👉 Build ou dist (se usar futuramente)
+dist/
+build/

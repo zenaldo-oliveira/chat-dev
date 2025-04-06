@@ -61,15 +61,22 @@ const scrollScreen = () => {
 };
 
 const processMessage = ({ data }) => {
-  const { userId, userName, userColor, content } = JSON.parse(data);
+  const { userId, userName, userColor, content, system } = JSON.parse(data);
 
-  const message =
-    userId == user.id
-      ? createMessageSelfElement(content)
-      : createMessageOtherElement(content, userName, userColor);
+  let message;
+
+  if (system) {
+    message = document.createElement("div");
+    message.classList.add("message--system");
+    message.textContent = content;
+  } else {
+    message =
+      userId === user.id
+        ? createMessageSelfElement(content)
+        : createMessageOtherElement(content, userName, userColor);
+  }
 
   chatMessage.appendChild(message);
-
   scrollScreen();
 };
 
@@ -83,9 +90,13 @@ const handleSubmit = (event) => {
   login.style.display = "none";
   chat.style.display = "flex";
 
-  websocket = new WebSocket("wss://chat-backend-63ie.onrender.com");
+  websocket = new WebSocket("ws://localhost:8080");
 
   websocket.onmessage = processMessage;
+
+  websocket.onopen = () => {
+    console.log("🟢 Conectado ao WebSocket com sucesso.");
+  };
 };
 
 const sendMessage = (event) => {

@@ -3,14 +3,23 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-const wss = new WebSocketServer({ port: process.env.PORT || 8080 });
+const PORT = process.env.PORT || 8080;
+const wss = new WebSocketServer({ port: PORT });
 
 wss.on("connection", (ws) => {
+  console.log("🟢 New client connected");
+
   ws.on("error", console.error);
 
   ws.on("message", (data) => {
-    wss.clients.forEach((client) => client.send(data.toString()));
-  });
+    const message = data.toString();
 
-  console.log("client connected");
+    wss.clients.forEach((client) => {
+      if (client.readyState === ws.OPEN) {
+        client.send(message);
+      }
+    });
+  });
 });
+
+console.log(`✅ WebSocket server is up and running on ws://localhost:${PORT}`);
