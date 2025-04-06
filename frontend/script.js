@@ -10,21 +10,15 @@ const chatMessage = document.querySelector(".chat__message");
 const user = { id: "", name: "", color: "" };
 
 const colors = [
-  "#FF0000", // vermelho puro
-  "#00FF00", // verde puro
-  "#0000FF", // azul puro
-  "#FFFF00", // amarelo neon
-  "#FF00FF", // magenta
-  "#00FFFF", // ciano
-  "#FF8800", // laranja vibrante
-  "#FF1493", // pink forte
-  "#8A2BE2", // roxo elétrico
-  "#00CED1", // azul piscina
-  "#FF4500", // laranja queimado
-  "#7FFF00", // verde chartreuse
-  "#DC143C", // vermelho cereja
-  "#1E90FF", // azul dodger
-  "#FFD700", // dourado vibrante
+  "aqua",
+  "cadetblue",
+  "blueviolet",
+  "darkgoldenrod",
+  "cornflowerblue",
+  "darkkhaki",
+  "hotpink",
+  "gold",
+  "navy",
 ];
 
 let websocket;
@@ -59,12 +53,11 @@ const getRandomColor = () => {
   return colors[randomIndex];
 };
 
-const scrollScreen = ({ top, behavior = "smooth" } = {}) => {
-  const scrollTarget = top ?? document.documentElement.scrollHeight;
-
-  if (typeof window !== "undefined") {
-    window.scrollTo({ top: scrollTarget, behavior });
-  }
+const scrollScreen = () => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth",
+  });
 };
 
 const processMessage = ({ data }) => {
@@ -87,13 +80,10 @@ const handleSubmit = (event) => {
   user.name = loginInput.value;
   user.color = getRandomColor();
 
-  websocket = new WebSocket("wss://chat-backend-63ie.onrender.com");
+  login.style.display = "none";
+  chat.style.display = "flex";
 
-  websocket.onopen = () => {
-    login.style.display = "none";
-    chat.style.display = "flex";
-  };
-
+  websocket = new WebSocket("ws://localhost:8080");
   websocket.onmessage = processMessage;
 };
 
