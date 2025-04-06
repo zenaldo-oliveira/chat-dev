@@ -1,13 +1,16 @@
 const { WebSocketServer } = require("ws");
+const http = require("http");
 const dotenv = require("dotenv");
 
 dotenv.config();
 
-const wss = new WebSocketServer({ port: process.env.PORT || 8080 });
+const PORT = process.env.PORT || 8080;
 
-console.log(
-  `✅ Servidor WebSocket rodando em ws://localhost:${process.env.PORT || 8080}`
-);
+// Cria servidor HTTP padrão
+const server = http.createServer();
+
+// Agora passa o HTTP para o WebSocket
+const wss = new WebSocketServer({ server });
 
 wss.on("connection", (ws) => {
   ws.on("error", console.error);
@@ -21,4 +24,9 @@ wss.on("connection", (ws) => {
   });
 
   console.log("🟢 Novo cliente conectado");
+});
+
+// Agora o HTTP server escuta na porta correta (que o Render define)
+server.listen(PORT, () => {
+  console.log(`✅ Servidor WebSocket rodando em ws://localhost:${PORT}`);
 });
