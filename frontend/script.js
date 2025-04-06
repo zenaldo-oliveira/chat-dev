@@ -87,7 +87,7 @@ const handleSubmit = (event) => {
   user.name = loginInput.value;
   user.color = getRandomColor();
 
-  websocket = new WebSocket("wss://chat-backend-63ie.onrender.com");
+  websocket = new WebSocket("wss://echo.websocket.org");
 
   websocket.onopen = () => {
     login.style.display = "none";
