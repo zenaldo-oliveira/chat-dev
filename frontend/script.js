@@ -87,12 +87,16 @@ const handleSubmit = (event) => {
   user.name = loginInput.value;
   user.color = getRandomColor();
 
-  login.style.display = "none";
-  chat.style.display = "flex";
-
   websocket = new WebSocket("wss://chat-backend-63ie.onrender.com");
+
+  websocket.onopen = () => {
+    login.style.display = "none";
+    chat.style.display = "flex";
+  };
+
   websocket.onmessage = processMessage;
 };
+
 const sendMessage = (event) => {
   event.preventDefault();
 
