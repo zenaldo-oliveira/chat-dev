@@ -38,9 +38,8 @@ const createMessageOtherElement = (content, sender, senderColor) => {
   span.classList.add("message--sender");
   span.style.color = senderColor;
 
-  div.appendChild(span);
-
   span.innerHTML = sender;
+  div.appendChild(span);
   div.innerHTML += content;
 
   return div;
@@ -59,15 +58,16 @@ const scrollScreen = () => {
 };
 
 const processMessage = ({ data }) => {
-  const { userId, userName, userColor, content, system } = JSON.parse(data);
+  const messageData = JSON.parse(data);
+  const { type, userId, userName, userColor, content } = messageData;
 
   let message;
 
-  if (system) {
+  if (type === "system") {
     message = document.createElement("div");
     message.classList.add("message--system");
     message.textContent = content;
-  } else {
+  } else if (type === "message") {
     message =
       userId === user.id
         ? createMessageSelfElement(content)
@@ -95,13 +95,14 @@ const handleSubmit = (event) => {
   websocket.onopen = () => {
     console.log("🟢 Conectado ao WebSocket com sucesso.");
 
-    // Envia mensagem de boas-vindas como mensagem do sistema
-    const welcomeMessage = {
-      system: true,
-      content: `👋 ${user.name} entrou no chat!`,
+    // Envia mensagem de login (servidor vai gerar a mensagem de sistema)
+    const loginMessage = {
+      type: "login",
+      userId: user.id,
+      userName: user.name,
     };
 
-    websocket.send(JSON.stringify(welcomeMessage));
+    websocket.send(JSON.stringify(loginMessage));
   };
 };
 
@@ -109,6 +110,7 @@ const sendMessage = (event) => {
   event.preventDefault();
 
   const message = {
+    type: "message",
     userId: user.id,
     userName: user.name,
     userColor: user.color,
@@ -116,7 +118,6 @@ const sendMessage = (event) => {
   };
 
   websocket.send(JSON.stringify(message));
-
   chatInput.value = "";
 };
 
