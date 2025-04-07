@@ -25,10 +25,8 @@ let websocket;
 
 const createMessageSelfElement = (content) => {
   const div = document.createElement("div");
-
   div.classList.add("message--self");
   div.innerHTML = content;
-
   return div;
 };
 
@@ -96,6 +94,14 @@ const handleSubmit = (event) => {
 
   websocket.onopen = () => {
     console.log("🟢 Conectado ao WebSocket com sucesso.");
+
+    // Envia mensagem de boas-vindas como mensagem do sistema
+    const welcomeMessage = {
+      system: true,
+      content: `👋 ${user.name} entrou no chat!`,
+    };
+
+    websocket.send(JSON.stringify(welcomeMessage));
   };
 };
 

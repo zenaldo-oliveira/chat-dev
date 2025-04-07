@@ -40,6 +40,14 @@ body {
     }
   }
 }
+
+.message--system {
+  text-align: center;
+  font-style: italic;
+  color: gray;
+  margin: 10px 0;
+}
+
 .login__form {
   display: flex;
   flex-direction: column;
