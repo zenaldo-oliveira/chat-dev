@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 8080;
 const wss = new WebSocketServer({ port: PORT });
 
 wss.on("connection", (ws) => {
-  console.log("🟢 New client connected");
+  console.log("🟢 New client connected..");
 
   ws.on("error", console.error);
 
