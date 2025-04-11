@@ -21,7 +21,7 @@ const colors = [
   "navy",
 ];
 
-let websocket;
+let socket;
 
 const createMessageSelfElement = (content) => {
   const div = document.createElement("div");
@@ -57,17 +57,16 @@ const scrollScreen = () => {
   });
 };
 
-const processMessage = ({ data }) => {
-  const messageData = JSON.parse(data);
-  const { type, userId, userName, userColor, content } = messageData;
+const processMessage = (messageData) => {
+  const { system, userId, userName, userColor, content } = messageData;
 
   let message;
 
-  if (type === "system") {
+  if (system) {
     message = document.createElement("div");
     message.classList.add("message--system");
     message.textContent = content;
-  } else if (type === "message") {
+  } else {
     message =
       userId === user.id
         ? createMessageSelfElement(content)
@@ -88,36 +87,26 @@ const handleSubmit = (event) => {
   login.style.display = "none";
   chat.style.display = "flex";
 
-  websocket = new WebSocket("wss://chet-dev-backend.onrender.com");
+  socket = io("https://chet-dev-backend.onrender.com");
 
-  websocket.onmessage = processMessage;
+  socket.emit("login", { userName: user.name });
 
-  websocket.onopen = () => {
-    console.log("🟢 Conectado ao WebSocket com sucesso.");
-
-    // Envia mensagem de login (servidor vai gerar a mensagem de sistema)
-    const loginMessage = {
-      type: "login",
-      userId: user.id,
-      userName: user.name,
-    };
-
-    websocket.send(JSON.stringify(loginMessage));
-  };
+  socket.on("chatMessage", (message) => {
+    processMessage(message);
+  });
 };
 
 const sendMessage = (event) => {
   event.preventDefault();
 
   const message = {
-    type: "message",
     userId: user.id,
     userName: user.name,
     userColor: user.color,
     content: chatInput.value,
   };
 
-  websocket.send(JSON.stringify(message));
+  socket.emit("message", message);
   chatInput.value = "";
 };
 

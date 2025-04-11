@@ -1,43 +1,45 @@
-const { WebSocketServer } = require("ws");
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const dotenv = require("dotenv");
 
 dotenv.config();
 
 const PORT = process.env.PORT || 8080;
-const wss = new WebSocketServer({ port: PORT });
 
-wss.on("connection", (ws) => {
-  console.log("🟢 New client connected..");
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Permite acesso de qualquer origem
+  },
+});
 
-  ws.on("error", console.error);
+io.on("connection", (socket) => {
+  console.log("🟢 New client connected..", socket.id);
 
-  ws.on("message", (data) => {
-    const message = JSON.parse(data.toString());
+  socket.on("login", ({ userName }) => {
+    const systemMessage = {
+      system: true,
+      content: `👋 ${userName} entrou no chat.`,
+    };
 
-    // Se for uma mensagem de login
-    if (message.type === "login") {
-      const systemMessage = {
-        system: true,
-        content: `👋 ${message.userName} entrou no chat.`,
-      };
+    // Envia para todos os conectados
+    io.emit("chatMessage", systemMessage);
+  });
 
-      broadcast(systemMessage);
-    }
-    // Se for uma mensagem normal de chat
-    else if (message.type === "message") {
-      broadcast(message);
-    }
+  socket.on("message", (data) => {
+    // data já pode ser um objeto com userName, content, etc.
+    io.emit("chatMessage", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("🔴 Usuário desconectado:", socket.id);
   });
 });
 
-function broadcast(message) {
-  const messageString = JSON.stringify(message);
-
-  wss.clients.forEach((client) => {
-    if (client.readyState === client.OPEN) {
-      client.send(messageString);
-    }
-  });
-}
-
-console.log(`✅ WebSocket server is up and running on ws://localhost:${PORT}`);
+server.listen(PORT, () => {
+  console.log(
+    `✅ Socket.IO server is up and running on http://localhost:${PORT}`
+  );
+});
